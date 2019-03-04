@@ -6,6 +6,8 @@ class Board(val rows: Int, val columns: Int) {
 
   // Returns the owner of the checker at position (row, column)
   def getCheckerAtPosition(row: Int, column: Int) = {
+    if(!isPositionInBoard(row, column))
+      throw new IllegalArgumentException(f"($row, $column) is not a valid position on board!")
     board(row - 1)(column - 1)
   }
 
