@@ -3,20 +3,19 @@ object Run {
   def main(args: Array[String]) {
 
     val game = new Game()
-    game.startNewGame(4,4,2)
+    game.startNewGame(6,6,4)
 
-    var input: String = null
-    var currentPlayer = Player.Player1;
+    var inputColumn = 0
+    var currentPlayer = Player.Player1
 
     println(game)
-    while ({input = scala.io.StdIn.readLine(); input != "" && !game.isGameOver()}) {
+    while ({inputColumn = scala.io.StdIn.readInt(); inputColumn !=  0 && !game.isGameOver()}) {
 
-      val inputColumn = input.toInt
       game.sinkChecker(inputColumn, currentPlayer)
 
-      currentPlayer match{
-        case Player.Player1 => currentPlayer = Player.Player2
-        case Player.Player2 => currentPlayer = Player.Player1
+      currentPlayer = currentPlayer match {
+        case Player.Player1 => Player.Player2
+        case Player.Player2 => Player.Player1
       }
       println(game)
 
