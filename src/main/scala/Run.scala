@@ -1,3 +1,5 @@
+import Player.Player
+
 object Run {
 
   def main(args: Array[String]) {
@@ -9,18 +11,24 @@ object Run {
     var currentPlayer = Player.Player1
 
     println(game)
-    while ({inputColumn = scala.io.StdIn.readInt(); inputColumn !=  0 && !game.isGameOver()}) {
+    while ({inputColumn = scala.io.StdIn.readInt(); inputColumn !=  -1 && !game.isGameOver()}) {
 
       game.sinkChecker(inputColumn, currentPlayer)
 
-      currentPlayer = currentPlayer match {
-        case Player.Player1 => Player.Player2
-        case Player.Player2 => Player.Player1
-      }
+      currentPlayer = otherPlayer(currentPlayer)
+
       println(game)
 
       if(game.isGameOver())
         print("Game over: " + game.gameState)
     }
+  }
+
+  // Notice how we do not need to define a return type if the return type is clear from the implementation.
+  def otherPlayer(currentPlayer: Player) = {
+    if(currentPlayer == Player.Player1)
+      Player.Player2
+    else
+      Player.Player1
   }
 }
