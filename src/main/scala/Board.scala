@@ -12,7 +12,7 @@ class Board(val rows: Int, val columns: Int) {
   }
 
   def isPositionInBoard(row: Int, column: Int): Boolean = {
-    return row >= 1 && row <= rows && column >= 1 && column <= columns
+    row >= 1 && row <= rows && column >= 1 && column <= columns
   }
 
   def sinkChecker(column: Int, player: Player): Unit = {
@@ -30,7 +30,6 @@ class Board(val rows: Int, val columns: Int) {
     }
 
     placeChecker(currentRow, column, player)
-
   }
 
   private def placeChecker(column: Int, row: Int, player: Player): Unit ={
@@ -40,17 +39,19 @@ class Board(val rows: Int, val columns: Int) {
   override def toString(): String = {
     var boardString = ""
     for (row <- rows to 1 by -1; column <- 1 to columns) {
-      getCheckerAtPosition(row, column) match {
-        case Player.Player1 => boardString += "1"
-        case Player.Player2 => boardString += "2"
-        case Player.NoPlayer => boardString += "0"
-      }
+      val checkerAtPosition = getCheckerAtPosition(row, column)
+      if(checkerAtPosition == Player.Player1)
+        boardString += "1"
+      else if(checkerAtPosition == Player.Player2)
+        boardString += "2"
+      else if(checkerAtPosition == Player.NoPlayer)
+        boardString += "0"
 
       if(column == columns)
         boardString += "\n"
       else
         boardString += "|"
     }
-    return boardString
+    boardString
   }
 }
