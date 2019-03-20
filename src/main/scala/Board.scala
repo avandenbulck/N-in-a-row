@@ -20,16 +20,13 @@ class Board(val rows: Int, val columns: Int) {
   }
 
   private def sinkChecker(row: Int, column: Int, player: Player): Unit = {
-    var currentRow = row
-
-    if(getCheckerAtPosition(currentRow, column) != Player.NoPlayer)
+    if(getCheckerAtPosition(row, column) != Player.NoPlayer)
       throw new IllegalArgumentException(f"Tried to insert a checker at position ($row,$column) which contains a player's checker.")
 
-    while(currentRow != 1 && getCheckerAtPosition(currentRow - 1, column) == Player.NoPlayer){
-      currentRow -=1
-    }
-
-    placeChecker(currentRow, column, player)
+    if(row == 1 || getCheckerAtPosition(row - 1, column) != Player.NoPlayer)
+      placeChecker(row, column, player)
+    else
+      sinkChecker(row - 1, column, player)
   }
 
   private def placeChecker(column: Int, row: Int, player: Player): Unit ={
