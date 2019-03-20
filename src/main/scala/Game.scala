@@ -39,19 +39,19 @@ class Game() {
 
     for (row <- 1 to board.rows) {
       if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinStateHorizontal(row, 1)
+        playerWon = CheckWinState(row, 1, {case(r,c) => (r, c + 1)})
     }
 
     for (column <- 1 to board.columns) {
       if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinStateVertical(1, column)
+        playerWon = CheckWinState(column, 1, {case(r,c) => (r + 1, c)})
     }
 
     for (row <- 1 to board.rows; column <- 1 to board.columns) {
       if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinStateDiagonalLeft(row, column)
+        playerWon = CheckWinState(row, column, {case(r,c) => (r + 1, c + 1)})
       if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinStateDiagonalRight(row, column)
+        playerWon = CheckWinState(row, column, {case(r,c) => (r - 1, c + 1)})
     }
 
     if(playerWon == Player.Player1)
@@ -60,7 +60,7 @@ class Game() {
       gameState = GameState.Player2Won
     }
 
-  def CheckWinStateHorizontal(row: Int, column: Int): Player = {
+  def CheckWinState(row: Int, column: Int, nextPosition: ((Int, Int)) => (Int, Int)): Player = {
     var nInRow = 0
     var checkingForPlayer = Player.NoPlayer
     var winningPlayer = Player.NoPlayer
@@ -78,78 +78,9 @@ class Game() {
       if (nInRow == nInRowToWin)
         winningPlayer = checkingForPlayer
 
-      currentColumn += 1
-    }
-    winningPlayer
-  }
-
-  def CheckWinStateVertical(row: Int, column: Int): Player = {
-    var nInRow = 0
-    var checkingForPlayer = Player.NoPlayer
-    var winningPlayer = Player.NoPlayer
-    var currentRow = row
-    var currentColumn = column
-
-    while(board.isPositionInBoard(currentRow, currentColumn) && winningPlayer == Player.NoPlayer) {
-      val playerAtPos = board.getCheckerAtPosition(currentRow, currentColumn)
-      if (playerAtPos == checkingForPlayer && playerAtPos != Player.NoPlayer)
-        nInRow += 1
-      else {
-        nInRow = 1
-        checkingForPlayer = playerAtPos
-      }
-      if (nInRow == nInRowToWin)
-        winningPlayer = checkingForPlayer
-
-      currentRow += 1
-    }
-    winningPlayer
-  }
-
-  def CheckWinStateDiagonalLeft(row: Int, column: Int): Player = {
-    var nInRow = 0
-    var checkingForPlayer = Player.NoPlayer
-    var winningPlayer = Player.NoPlayer
-    var currentRow = row
-    var currentColumn = column
-
-    while(board.isPositionInBoard(currentRow, currentColumn) && winningPlayer == Player.NoPlayer) {
-      val playerAtPos = board.getCheckerAtPosition(currentRow, currentColumn)
-      if (playerAtPos == checkingForPlayer && playerAtPos != Player.NoPlayer)
-        nInRow += 1
-      else {
-        nInRow = 1
-        checkingForPlayer = playerAtPos
-      }
-      if (nInRow == nInRowToWin)
-        winningPlayer = checkingForPlayer
-
-      currentColumn += 1
-      currentRow -= 1
-    }
-    winningPlayer
-  }
-
-  def CheckWinStateDiagonalRight(row: Int, column: Int): Player = {
-    var nInRow = 0
-    var checkingForPlayer = Player.NoPlayer
-    var winningPlayer = Player.NoPlayer
-    var currentRow = row
-    var currentColumn = column
-
-    while(board.isPositionInBoard(currentRow, currentColumn) && winningPlayer == Player.NoPlayer) {
-      val playerAtPos = board.getCheckerAtPosition(currentRow, currentColumn)
-      if (playerAtPos == checkingForPlayer && playerAtPos != Player.NoPlayer)
-        nInRow += 1
-      else {
-        nInRow = 1
-        checkingForPlayer = playerAtPos
-      }
-      if (nInRow == nInRowToWin)
-        winningPlayer = checkingForPlayer
-
-      currentColumn += 1
-      currentRow += 1
+      val (newRow, newCol) = nextPosition((currentRow, currentColumn))
+      currentRow = newRow
+      currentColumn = newCol
     }
     winningPlayer
   }
