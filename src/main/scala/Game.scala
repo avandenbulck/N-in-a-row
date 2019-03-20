@@ -37,22 +37,16 @@ class Game() {
   def CheckWinState(): Unit = {
     var playerWon: Player = Player.NoPlayer
 
-    for (row <- 1 to board.rows) {
-      if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinState(row, 1, {case(r,c) => (r, c + 1)})
-    }
+    val checkForWinner = (row:Int, column:Int, nextPosition: ((Int, Int)) => (Int, Int)) =>
+      if(playerWon == Player.NoPlayer)
+        playerWon = CheckWinState(row, column, nextPosition)
 
-    for (column <- 1 to board.columns) {
-      if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinState(column, 1, {case(r,c) => (r + 1, c)})
-    }
+    (1 to board.rows).foreach(checkForWinner(_, 1, {case(r,c) => (r + 1, c)}))
+    (1 to board.columns).foreach(checkForWinner(1, _, {case(r,c) => (r, c + 1)}))
 
-    for (row <- 1 to board.rows; column <- 1 to board.columns) {
-      if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinState(row, column, {case(r,c) => (r + 1, c + 1)})
-      if (playerWon == Player.NoPlayer)
-        playerWon = CheckWinState(row, column, {case(r,c) => (r - 1, c + 1)})
-    }
+    val allPositions = for(r <- 1 to board.rows;c <- 1 to board.columns) yield (r,c)
+    allPositions.foreach({case (r,c) => checkForWinner(r, c, {case(r,c) => (r + 1, c + 1)})})
+    allPositions.foreach({case (r,c) => checkForWinner(r, c, {case(r,c) => (r - 1, c + 1)})})
 
     if(playerWon == Player.Player1)
       gameState = GameState.Player1Won
