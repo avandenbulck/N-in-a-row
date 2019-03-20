@@ -21,7 +21,7 @@ class Game() {
       else if(gameState == GameState.Player2Turn)
         gameState = GameState.Player1Turn
 
-      CheckWinState()
+      checkWinState()
     }
     else
       throw new IllegalArgumentException(f"Player $player%s tried to play, but gamestate is $gameState%s")
@@ -34,12 +34,12 @@ class Game() {
       gameState == GameState.Player2Turn && player == Player.Player2
   }
 
-  def CheckWinState(): Unit = {
+  def checkWinState(): Unit = {
     var playerWon: Player = Player.NoPlayer
 
     val checkForWinner = (row:Int, column:Int, nextPosition: ((Int, Int)) => (Int, Int)) =>
       if(playerWon == Player.NoPlayer)
-        playerWon = CheckWinState(row, column, nextPosition)
+        playerWon = checkWinState(row, column, nextPosition)
 
     (1 to board.rows).foreach(checkForWinner(_, 1, {case(r,c) => (r + 1, c)}))
     (1 to board.columns).foreach(checkForWinner(1, _, {case(r,c) => (r, c + 1)}))
@@ -54,29 +54,20 @@ class Game() {
       gameState = GameState.Player2Won
     }
 
-  def CheckWinState(row: Int, column: Int, nextPosition: ((Int, Int)) => (Int, Int)): Player = {
-    var nInRow = 0
-    var checkingForPlayer = Player.NoPlayer
-    var winningPlayer = Player.NoPlayer
-    var currentRow = row
-    var currentColumn = column
+  def checkWinState(row: Int, column: Int, nextPosition: ((Int, Int)) => (Int, Int), checkingForPlayer: Player = Player.NoPlayer, sameInARow: Int = 0): Player = {
+    if(sameInARow == nInRowToWin)
+      checkingForPlayer
+    else if (!board.isPositionInBoard(row, column))  {
+      Player.NoPlayer
+    } else {
+      val playerAtPos = board.getCheckerAtPosition(row, column)
+      val (newRow, newCol) = nextPosition((row, column))
 
-    while(board.isPositionInBoard(currentRow, currentColumn) && winningPlayer == Player.NoPlayer) {
-      val playerAtPos = board.getCheckerAtPosition(currentRow, currentColumn)
-      if (playerAtPos == checkingForPlayer && playerAtPos != Player.NoPlayer)
-        nInRow += 1
-      else {
-        nInRow = 1
-        checkingForPlayer = playerAtPos
-      }
-      if (nInRow == nInRowToWin)
-        winningPlayer = checkingForPlayer
-
-      val (newRow, newCol) = nextPosition((currentRow, currentColumn))
-      currentRow = newRow
-      currentColumn = newCol
+      if(playerAtPos == checkingForPlayer && playerAtPos != Player.NoPlayer)
+        checkWinState(newRow, newCol,nextPosition, checkingForPlayer, sameInARow + 1)
+      else
+        checkWinState(newRow, newCol,nextPosition, playerAtPos, 1)
     }
-    winningPlayer
   }
 
   def isGameOver(): Boolean ={
